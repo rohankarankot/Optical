@@ -127,6 +127,7 @@ public class DashBoard extends JFrame {
 	private int AddedToDb=0;
 	private JTable ReportTable;
 	private JTextField CustomerFullTotal;
+	 Object eve;
 	/**
 	 * Launch the application.
 	 */
@@ -937,7 +938,7 @@ public class DashBoard extends JFrame {
 				SimpleDateFormat = new SimpleDateFormat("EEEE");
 				String txtDay = SimpleDateFormat.format(now).toUpperCase();
 				 LocalDateTime myDateObj = LocalDateTime.now();
-				 DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+				 DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 				    formattedDate = myDateObj.format(myFormatObj);
 				PrintArea.setText("   ------------------------------ RAJ OPTICALS.--------------------------  \n"
 						+"DATE : "+formattedDate+"                                                   DAY : "+txtDay+"  \n"
@@ -1383,24 +1384,25 @@ public class DashBoard extends JFrame {
 		
 		JLabel CustomerFullname = new JLabel("name");
 		CustomerFullname.setFont(new Font("Tahoma", Font.BOLD, 15));
-		CustomerFullname.setBounds(25, 95, 277, 34);
+		CustomerFullname.setBounds(25, 96, 277, 34);
 		ViewOrders.add(CustomerFullname);
 		
 		JLabel lblTotal = new JLabel("Total :");
 		lblTotal.setFont(new Font("Tahoma", Font.BOLD, 15));
-		lblTotal.setBounds(458, 95, 47, 34);
+		lblTotal.setBounds(449, 96, 47, 34);
 		ViewOrders.add(lblTotal);
 		
 		CustomerFullTotal = new JTextField();
 		CustomerFullTotal.setFont(new Font("Tahoma", Font.BOLD, 15));
-		CustomerFullTotal.setBounds(515, 97, 80, 34);
+		CustomerFullTotal.setBounds(506, 91, 80, 42);
 		ViewOrders.add(CustomerFullTotal);
 		CustomerFullTotal.setColumns(10);
 		
 		
 		JLabel lblOrderDate = new JLabel("Order date");
+		lblOrderDate.setHorizontalAlignment(SwingConstants.LEFT);
 		lblOrderDate.setFont(new Font("Tahoma", Font.BOLD, 15));
-		lblOrderDate.setBounds(330, 97, 127, 34);
+		lblOrderDate.setBounds(312, 96, 127, 34);
 		ViewOrders.add(lblOrderDate);
 		
 		
@@ -1440,9 +1442,15 @@ public class DashBoard extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				try {
-					String name = AllOrders.getValueAt(AllOrders.getSelectedRow(), 0).toString();
-					String orderedDate =  AllOrders.getValueAt(AllOrders.getSelectedRow(), 1).toString();
-					String Total =  AllOrders.getValueAt(AllOrders.getSelectedRow(), 2).toString();
+					int row = AllOrders.getSelectedRow();
+					  eve =  AllOrders.getModel().getValueAt(row, 0);
+					 
+					
+					 
+					 
+					String name = AllOrders.getValueAt(AllOrders.getSelectedRow(),1).toString();
+					String orderedDate =  AllOrders.getValueAt(AllOrders.getSelectedRow(), 2).toString();
+					String Total =  AllOrders.getValueAt(AllOrders.getSelectedRow(), 3).toString();
 					
 					CustomerFullname.setText(name);
 					CustomerFullTotal.setText(Total);
@@ -1451,16 +1459,22 @@ public class DashBoard extends JFrame {
 					e2.printStackTrace();
 				}
 				try {
-					String name = AllOrders.getValueAt(AllOrders.getSelectedRow(), 0).toString();
+					String name = AllOrders.getValueAt(AllOrders.getSelectedRow(), 1).toString();
 					Connection connection = DbConnection.dbConnector();
-					String SearchQuery="SELECT FullName,OrderDate,TotalPrice,Frame,RSph,RCyl,RAxis,RNear,LSph,LCyl,LAxis,LNear FROM Orders WHERE FullName like '"+name+"%'";
+					String SearchQuery="SELECT OrderId,FullName,OrderDate,TotalPrice,Frame,RSph,RCyl,"
+							+ "RAxis,RNear,LSph,LCyl,LAxis,LNear FROM Orders WHERE FullName like '"+name+"%'";
 					PreparedStatement pst  = connection.prepareStatement(SearchQuery);
 					ResultSet rs = pst.executeQuery();
 					AllOrders.setFont(new Font("Tohama", Font.BOLD , 17));
 					AllOrders.setModel(DbUtils.resultSetToTableModel(rs));
-					AllOrders.getColumnModel().getColumn(0).setPreferredWidth(250);
-					AllOrders.getColumnModel().getColumn(1).setPreferredWidth(100);
+//					AllOrders.getColumnModel().getColumn(0).setPreferredWidth(0);
+//					AllOrders.removeColumn(AllOrders.getColumnModel().getColumn(0));
+					AllOrders.getColumnModel().getColumn(0).setPreferredWidth(0);
+					AllOrders.getColumnModel().getColumn(1).setPreferredWidth(250);
 					AllOrders.getColumnModel().getColumn(2).setPreferredWidth(100);
+					AllOrders.getColumnModel().getColumn(3).setPreferredWidth(100);
+					
+					
 					rs.close();
 					connection.close();
 				} catch (Exception e2) {
@@ -1480,17 +1494,20 @@ public class DashBoard extends JFrame {
 				}else {
 					try {
 						Connection connection = DbConnection.dbConnector();
-						String SearchQuery="SELECT FullName,OrderDate,TotalPrice,Frame,RSph,RCyl,RAxis,RNear,"
+						String SearchQuery="SELECT OrderId,FullName,OrderDate,TotalPrice,Frame,RSph,RCyl,RAxis,RNear,"
 								+ "LSph,LCyl,LAxis,LNear FROM Orders"
-								+ " WHERE FullName like ? OR Mobile=? ";
+								+ " WHERE Status='true'  AND FullName like ? OR Mobile=? ";
 						PreparedStatement pst  = connection.prepareStatement(SearchQuery);
 						pst.setString(1, "%"+SearchOrder.getText().trim()+"%");
 						pst.setString(2, SearchOrder.getText().trim());
 						ResultSet rs = pst.executeQuery();
 						AllOrders.setFont(new Font("Tohama", Font.BOLD , 17));
 						AllOrders.setModel(DbUtils.resultSetToTableModel(rs));
-						AllOrders.getColumnModel().getColumn(0).setPreferredWidth(180);
-						AllOrders.getColumnModel().getColumn(1).setPreferredWidth(100);
+//						AllOrders.getColumnModel().getColumn(0).setPreferredWidth(0);
+//						AllOrders.removeColumn(AllOrders.getColumnModel().getColumn(0));
+//						AllOrders.getColumnModel().getColumn(0).setPreferredWidth(180);
+						AllOrders.getColumnModel().getColumn(0).setPreferredWidth(0);
+						AllOrders.getColumnModel().getColumn(1).setPreferredWidth(250);
 						AllOrders.getColumnModel().getColumn(2).setPreferredWidth(100);
 						rs.close();
 						connection.close();
@@ -1526,11 +1543,11 @@ public class DashBoard extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				if (JOptionPane.showConfirmDialog(null,"Sure you want to Delete Record ?","Warning",
 			            JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION) {
-					String fname = CustomerFullname.getText().toString();
-					String OrderedDate = lblOrderDate.getText();
+					
+				
 					try {
 						Connection connection = DbConnection.dbConnector();
-						String SearchQuery="DELETE FROM Orders  WHERE FullName='"+fname+"' AND OrderDate='"+OrderedDate+"';";
+						String SearchQuery="DELETE FROM Orders  WHERE OrderId='"+eve+"';";
 						PreparedStatement pst  = connection.prepareStatement(SearchQuery);
 						int rowAffected = pst.executeUpdate();
 						pst.close();
@@ -1625,17 +1642,16 @@ public class DashBoard extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 					
 				try {
-					SimpleDateFormat sdf =  new SimpleDateFormat("dd-MM-YYYY");
+					SimpleDateFormat sdf =  new SimpleDateFormat("yyyy-MM-dd");
 					String FromDate = sdf.format(FromdateChooser.getDate());
 					String ToDate = sdf.format(TodateChooser.getDate());
-					
 					Connection connection = DbConnection.dbConnector();
-					String ReportQuery="SELECT FullName,TockenNo as BillNo,TotalPrice as Sale, AdvancePaid as Advance, AmountDue as Balance,Status as Delivery  from Orders where"
-							+ " ( OrderDate BETWEEN '"+FromDate+"' AND '"+ToDate+"')";
+					String ReportQuery="SELECT FullName,OrderDate,TockenNo as BillNo,TotalPrice as Total_Sale, Status as Delivery  from Orders WHERE"
+							+ " ( OrderDate BETWEEN '"+FromDate+"' AND '"+ToDate+"'+ ' 23:59:59')";
 					
 					
 					String TotalQuery="SELECT SUM(TotalPrice) as 'Total Sale', SUM(AdvancePaid) as 'Total Advance',SUM(AmountDue) as 'Total Balance' FROM Orders where"
-							+ " ( OrderDate BETWEEN '"+FromDate+"' AND '"+ToDate+"')";
+							+ " ( OrderDate BETWEEN '"+FromDate+"' AND '"+ToDate+"'+ ' 23:59:59')";
 					PreparedStatement pst  = connection.prepareStatement(ReportQuery);
 					
 					PreparedStatement pst1  = connection.prepareStatement(TotalQuery);
@@ -1691,7 +1707,7 @@ public class DashBoard extends JFrame {
 				try {
 					
 					 LocalDateTime myDateObj = LocalDateTime.now();
-					 DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+					 DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 					    formattedDate = myDateObj.format(myFormatObj);
 					Connection connection = DbConnection.dbConnector();
 					String ReportQuery="SELECT FullName,TockenNo as BillNo,TotalPrice as Sale, AdvancePaid as Advance, AmountDue as Balance,Status as Delivery  from Orders where"
@@ -1748,7 +1764,7 @@ public class DashBoard extends JFrame {
 		JLabel lblAbcComp = new JLabel("Raj Opticals");
 		lblAbcComp.setHorizontalAlignment(SwingConstants.CENTER);
 		lblAbcComp.setFont(new Font("Roboto Mono Medium", Font.BOLD, 18));
-		lblAbcComp.setBounds(5, 0, 1358, 64);
+		lblAbcComp.setBounds(10, -1, 1358, 64);
 		panel.add(lblAbcComp);
 		
 		TimeLabel = new JLabel("New label");
@@ -1764,9 +1780,10 @@ public class DashBoard extends JFrame {
 		panel.add(TimeLabel);
 		
 		JLabel logo = new JLabel("");
+		logo.setHorizontalAlignment(SwingConstants.CENTER);
 		Image img = new ImageIcon(this.getClass().getResource("logo.png")).getImage();
 		logo.setIcon(new ImageIcon(img));
-		logo.setBounds(42, 0, 77, 64);
+		logo.setBounds(10, 0, 78, 64);
 		panel.add(logo);
 		
 		JPanel panel_1 = new JPanel();
@@ -1792,7 +1809,8 @@ public class DashBoard extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					Connection connection = DbConnection.dbConnector();
-					String Viewquery = "SELECT FullName,OrderDate,TotalPrice as Total,Mobile,Frame,Glass,SunGlass,TotalPrice as Total, AmountDue as Balance FROM Orders where Status='true' ORDER BY OrderDate DESC";
+					String Viewquery = "SELECT OrderId,FullName,OrderDate,TotalPrice as Total,Mobile,Frame,Glass,"
+							+ "SunGlass,TotalPrice as Total, AmountDue as Balance FROM Orders where Status='true' ORDER BY OrderDate DESC";
 					PreparedStatement pst  = connection.prepareStatement(Viewquery);
 					ResultSet rs = pst.executeQuery();
 					
@@ -1804,9 +1822,10 @@ public class DashBoard extends JFrame {
 					 JTableHeader tableHeader = AllOrders.getTableHeader();
 				      Font headerFont = new Font("Tohama", Font.BOLD, 18);
 				      tableHeader.setFont(headerFont);
-					AllOrders.getColumnModel().getColumn(0).setPreferredWidth(180);
-//					AllOrders.getColumnModel().getColumn(1).setPreferredWidth(150);
-//					AllOrders.getColumnModel().getColumn(6).setPreferredWidth(30);
+//				      AllOrders.removeColumn(AllOrders.getColumnModel().getColumn(0));
+//					AllOrders.getColumnModel().getColumn(0).setPreferredWidth(0);
+					AllOrders.getColumnModel().getColumn(0).setPreferredWidth(1);
+					AllOrders.getColumnModel().getColumn(1).setPreferredWidth(250);
 					rs.close();
 					connection.close();
 					
@@ -1952,14 +1971,22 @@ public class DashBoard extends JFrame {
 				TotalBeforeDiscount=0;
 				TotalAfterDiscount=0;
 				Discount.setText("");
-				RtxtSph.setText("");
-				RtxtCyl.setText("");
-				RtxtAxis.setText("");
-				RtxtNear.setText("");
-				LtxtSph.setText("");
-				LtxtCyl.setText("");
-				LtxtAxis.setText("");
-				LtxtNear.setText("");
+				 RSph="";
+				 RCyl="";
+				 RAxis="";
+				 RNear="";
+				 LSph="";
+				 LCyl="";
+				 LAxis="";
+				 LNear="";
+				 RtxtSph.setText("");
+				 RtxtCyl.setText("");
+				 RtxtAxis.setText("");
+				 RtxtNear.setText("");
+				 LtxtSph.setText("");
+				 LtxtCyl.setText("");
+				 LtxtAxis.setText("");
+				 LtxtNear.setText("");
 				PrintArea.setText("");
 				Frametype="";
 				PrintArea.setVisible(false);
